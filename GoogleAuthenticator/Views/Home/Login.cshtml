@@ -1,0 +1,64 @@
+﻿@model GoogleAuthenticator.Models.LoginModel
+
+@{
+    ViewBag.Title = "Login";
+    var messageClass = Session["IsValid2FA"] == null || !(bool)Session["IsValid2FA"] ? "text-danger" : "";
+}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-3">Google Authenticator</h1>
+        <p class="lead">Second Factor Authentication using <a href="http://www.google.com/landing/2step/#tab=how-it-protects" class="alert-link">Google Authenticator</a>            
+        <p class="lead">Requirements: </p>
+        <ul>
+            <li>Google Authenticator app</li>
+            <li>User: Admin</li>
+            <li>Password: password</li>
+        </ul>
+        <a href="https://bitbucket.org/fleekdeveloper/fleekdeveloper.authenticator.mvc/overview" target="_blank" class="btn btn-sm btn-default">Source Code</a>
+        <a href="@Html.Raw("https://medium.com/@fleekdeveloper/2fa-with-google-authenticator-in-asp-mvc-4788c79c47")" target="_blank" class="btn btn-sm btn-default">Blog</a>
+        
+    </div>
+</div>
+
+@if (ViewBag.Status == null || !ViewBag.Status)
+{
+
+    <h2>Step 1: Login</h2>
+    <div class="@messageClass">@ViewBag.Message</div>
+    <div>
+        @using (Html.BeginForm())
+        {
+            <div class="form-group">
+                <label for="UserName">UserName:</label>
+                @Html.TextBoxFor(m => m.Username, new {@class = "form-control", placeholder = "Admin"})
+            </div>
+            <div class="form-group">
+                <label for="Password">Password:</label>
+                @Html.TextBoxFor(m => m.Password, new {@class = "form-control", type = "password", placeholder = "password"})
+            </div>
+            <input type="submit" value="Login" class="btn btn-default"/>
+        }
+    </div>
+}
+else
+{
+    <h2>Step 2: Google Authenticator</h2>
+    <h5>@ViewBag.Message</h5>
+    <div>
+        <img src="@ViewBag.BarcodeImageUrl"/>
+    </div>
+    <div>
+        <h5>Manual Setup Up</h5>
+        <p>Type the following code in your Google Authenticator App</p>
+        <p>@ViewBag.SetupCode</p>
+    </div>
+    <div>
+        @using (Html.BeginForm("Verify2Fa", "Home", FormMethod.Post))
+        {
+            <p>Enter Token:</p>
+            <input type="text" name="passcode"/>
+            <input type="submit" class="btn btn-success"/>
+        }
+    </div>
+}
